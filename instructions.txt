@@ -1,0 +1,34 @@
+1.
+
+edit index.txt
+
+
+Change the attached to any file that you want to do
+
+ <h1>Hello World</h1>
+
+
+
+2.
+edit 
+
+sw.js
+
+const CACHE_NAME = 'helloWord';
+
+
+Change the hello world to anything that you wish to name the file
+
+
+3.
+edit 
+
+
+manifest.json
+
+
+change the two names to the desired outcome and use  the correct URL
+
+"name": "Emotion Code Cards",
+ "short_name": "EmotionCards",
+ "start_url": "/mockBiz/",
