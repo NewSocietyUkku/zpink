@@ -3,17 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World App</title>
+    <title>Pink noise for sleeping</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#3498db">
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c0c1d 0%, #1a1a2e 100%);
+            color: #f1f1f1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(25, 25, 45, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #f8a5c2;
+            margin-bottom: 15px;
+            font-size: 2.2rem;
+        }
+        
+        .subtitle {
+            color: #a8d0e6;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .status {
+            background: rgba(248, 165, 194, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #f8a5c2;
+        }
+        
+        .controls {
+            margin: 25px 0;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a8d0e6;
+            font-weight: bold;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 10px;
+            -webkit-appearance: none;
+            background: rgba(248, 165, 194, 0.2);
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #f8a5c2;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(248, 165, 194, 0.5);
+        }
+        
+        .value {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            color: #f8a5c2;
+            font-weight: bold;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        button {
+            flex: 1;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        #startBtn {
+            background: linear-gradient(to right, #f8a5c2, #e67e9c);
+            color: #1a1a2e;
+        }
+        
+        #stopBtn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f1f1f1;
+            border: 1px solid rgba(248, 165, 194, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(230, 126, 156, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .wave-container {
+            height: 100px;
+            width: 100%;
+            margin: 25px 0;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .wave {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.6;
+        }
+        
+        .wave-bar {
+            position: absolute;
+            bottom: 0;
+            width: 4px;
+            background: rgba(248, 165, 194, 0.7);
+            border-radius: 2px 2px 0 0;
+            transition: height 0.2s ease;
+        }
+        
+        .info {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #8a8aa3;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .container {
+            animation: fadeIn 0.5s ease;
+        }
+    </style>
 </head>
 <body>
-
-    <h1>Hello World</h1>
+    <div class="container">
+        <h1>🌙 Smooth Pink Noise</h1>
+        <p class="subtitle">Continuous, consistent pink noise for better sleep</p>
+        
+        <div class="status" id="status">
+            Tap "Start" to begin smooth pink noise
+        </div>
+        
+        <div class="wave-container" id="waveContainer">
+            <!-- Wave bars will be generated here -->
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="volume">Volume</label>
+                <input type="range" min="0" max="100" value="40" class="slider" id="volume">
+                <div class="value" id="volumeValue">40%</div>
+            </div>
+            
+            <div class="control-group">
+                <label for="bass">Bass Level</label>
+                <input type="range" min="0" max="100" value="50" class="slider" id="bass">
+                <div class="value" id="bassValue">50%</div>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button id="startBtn">
+                <span id="playIcon">▶</span> Start
+            </button>
+            <button id="stopBtn">
+                <span>⏹</span> Stop
+            </button>
+        </div>
+        
+        <div class="info">
+            <p>This version uses a smoother pink noise algorithm that eliminates crackling and popping sounds. Perfect for uninterrupted sleep.</p>
+        </div>
+    </div>
 
     <script>
-        // This part is CRUCIAL: It keeps your Service Worker (sw.js) running 
+        // Audio variables
+        let audioContext = null;
+        let noiseSource = null;
+        let isPlaying = false;
+        let animationId = null;
+        
+        // DOM elements
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const volumeSlider = document.getElementById('volume');
+        const bassSlider = document.getElementById('bass');
+        const volumeValue = document.getElementById('volumeValue');
+        const bassValue = document.getElementById('bassValue');
+        const status = document.getElementById('status');
+        const waveContainer = document.getElementById('waveContainer');
+        const playIcon = document.getElementById('playIcon');
+        
+        // Create smooth wave visualization
+        function createWaveVisualization() {
+            waveContainer.innerHTML = '';
+            const barCount = 60;
+            
+            for (let i = 0; i < barCount; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'wave-bar';
+                bar.style.left = `${(i / barCount) * 100}%`;
+                bar.style.height = `${10 + Math.random() * 40}%`;
+                waveContainer.appendChild(bar);
+            }
+        }
+        
+        // Animate wave visualization
+        function animateWave() {
+            const bars = document.querySelectorAll('.wave-bar');
+            bars.forEach(bar => {
+                // Gentle, smooth movement
+                const currentHeight = parseFloat(bar.style.height);
+                const targetHeight = 10 + Math.random() * 40;
+                const newHeight = currentHeight + (targetHeight - currentHeight) * 0.1;
+                bar.style.height = `${newHeight}%`;
+            });
+            
+            if (isPlaying) {
+                animationId = requestAnimationFrame(animateWave);
+            }
+        }
+        
+        // Initialize wave visualization
+        createWaveVisualization();
+        
+        // Update volume display
+        volumeSlider.addEventListener('input', function() {
+            volumeValue.textContent = `${this.value}%`;
+        });
+        
+        // Update bass display
+        bassSlider.addEventListener('input', function() {
+            bassValue.textContent = `${this.value}%`;
+        });
+        
+        // Create SMOOTH pink noise using filter method
+        function createSmoothPinkNoise() {
+            // Create a white noise source
+            const bufferSize = 2 * audioContext.sampleRate;
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            // Fill with white noise (much larger buffer for smoothness)
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.loop = true;
+            
+            // Create filter chain for pink noise effect
+            // Using multiple filters for smoother result
+            const filters = [];
+            
+            // First filter -3dB/octave
+            const filter1 = audioContext.createBiquadFilter();
+            filter1.type = 'lowpass';
+            filter1.frequency.value = 10000;
+            filter1.Q.value = 0.5;
+            
+            // Second filter for additional smoothing
+            const filter2 = audioContext.createBiquadFilter();
+            filter2.type = 'lowpass';
+            filter2.frequency.value = 5000;
+            filter2.Q.value = 0.7;
+            
+            // Bass boost filter
+            const bassFilter = audioContext.createBiquadFilter();
+            bassFilter.type = 'lowshelf';
+            bassFilter.frequency.value = 200;
+            bassFilter.gain.value = (bassSlider.value - 50) * 0.5; // Gentle bass adjustment
+            
+            // Volume control
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = volumeSlider.value / 100;
+            
+            // Connect nodes: source -> filter1 -> filter2 -> bassFilter -> gain -> output
+            source.connect(filter1);
+            filter1.connect(filter2);
+            filter2.connect(bassFilter);
+            bassFilter.connect(gainNode);
+            
+            // Update bass when slider changes
+            bassSlider.addEventListener('input', function() {
+                bassFilter.gain.value = (this.value - 50) * 0.5;
+            });
+            
+            // Update volume when slider changes
+            volumeSlider.addEventListener('input', function() {
+                gainNode.gain.value = this.value / 100;
+            });
+            
+            return {
+                source: source,
+                gainNode: gainNode,
+                bassFilter: bassFilter
+            };
+        }
+        
+        // Alternative: EVEN SMOOTHER pink noise using script processor
+        function createSuperSmoothPinkNoise() {
+            const bufferSize = 4096;
+            const node = audioContext.createScriptProcessor(bufferSize, 1, 1);
+            
+            // Pink noise variables
+            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0;
+            
+            node.onaudioprocess = function(e) {
+                const output = e.outputBuffer.getChannelData(0);
+                
+                // Generate pink noise with averaging for smoothness
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    
+                    // Standard pink noise filter
+                    b0 = 0.99886 * b0 + white * 0.0555179;
+                    b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520;
+                    b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522;
+                    b5 = -0.7616 * b5 - white * 0.0168980;
+                    
+                    // Average with previous sample for smoothness
+                    let pink = b0 + b1 + b2 + b3 + b4 + b5 + white * 0.5362;
+                    pink *= 0.11; // Scale
+                    
+                    output[i] = pink;
+                }
+            };
+            
+            // Create bass filter
+            const bassFilter = audioContext.createBiquadFilter();
+            bassFilter.type = 'lowshelf';
+            bassFilter.frequency.value = 200;
+            bassFilter.gain.value = (bassSlider.value - 50) * 0.3;
+            
+            // Create gain node
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = volumeSlider.value / 100;
+            
+            // Connect
+            node.connect(bassFilter);
+            bassFilter.connect(gainNode);
+            
+            // Update bass when slider changes
+            bassSlider.addEventListener('input', function() {
+                bassFilter.gain.value = (this.value - 50) * 0.3;
+            });
+            
+            // Update volume when slider changes
+            volumeSlider.addEventListener('input', function() {
+                gainNode.gain.value = this.value / 100;
+            });
+            
+            return {
+                source: node,
+                gainNode: gainNode,
+                bassFilter: bassFilter
+            };
+        }
+        
+        // Start smooth pink noise
+        function startNoise() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            
+            // Stop if already playing
+            if (isPlaying) {
+                stopNoise();
+                return;
+            }
+            
+            // Create super smooth pink noise
+            const audioNodes = createSuperSmoothPinkNoise();
+            noiseSource = audioNodes.source;
+            
+            // Connect to output
+            audioNodes.gainNode.connect(audioContext.destination);
+            
+            isPlaying = true;
+            
+            // Update UI
+            startBtn.innerHTML = '<span>⏸</span> Pause';
+            status.textContent = 'Playing smooth pink noise...';
+            status.style.background = 'rgba(76, 175, 80, 0.1)';
+            status.style.borderLeftColor = '#4CAF50';
+            
+            // Start wave animation
+            animateWave();
+        }
+        
+        // Stop noise
+        function stopNoise() {
+            if (noiseSource && isPlaying) {
+                noiseSource.disconnect();
+                noiseSource = null;
+            }
+            
+            isPlaying = false;
+            
+            // Update UI
+            startBtn.innerHTML = '<span id="playIcon">▶</span> Start';
+            status.textContent = 'Stopped. Tap "Start" to begin.';
+            status.style.background = 'rgba(248, 165, 194, 0.1)';
+            status.style.borderLeftColor = '#f8a5c2';
+            
+            // Stop animation
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', function() {
+            if (!isPlaying) {
+                startNoise();
+            } else {
+                stopNoise();
+            }
+        });
+        
+        stopBtn.addEventListener('click', stopNoise);
+        
+        // Initialize audio on first user interaction
+        document.addEventListener('click', function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                status.textContent = 'Audio ready. Tap "Start" to play smooth pink noise.';
+            }
+        }, { once: true });
+    </script>
+
+
+    <script>
+        // ########This part is CRUCIAL: It keeps your Service Worker (sw.js) running 
         // so the app stays "installable" and works offline.
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

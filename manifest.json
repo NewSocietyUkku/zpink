@@ -1,7 +1,7 @@
 {
-  "name": "helloWorld",
-  "short_name": "helloWorld",
-  "start_url": "/test/",
+  "name": "zpink",
+  "short_name": "zpink",
+  "start_url": "/zpink/",
   "display": "standalone",
   "background_color": "#f5f7fa",
   "theme_color": "#3498db",
