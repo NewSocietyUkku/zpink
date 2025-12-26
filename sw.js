@@ -1,10 +1,10 @@
-const CACHE_NAME = 'zpink';
+const CACHE_NAME = 'zdence-2';
 const urlsToCache = [
-  '/zpink/',
-  '/zpink/index.html',
-  '/zpink/manifest.json',
-  '/zpink/sw.js',
-  '/zpink/icon.png'
+  '/zdence/',
+  '/zdence/index.html',
+  '/zdence/manifest.json',
+  '/zdence/sw.js',
+  '/zdence/icon.png'
 ];
 
 self.addEventListener('install', event => {
